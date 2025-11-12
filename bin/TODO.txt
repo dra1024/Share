@@ -1,0 +1,3 @@
+Set-NetConnectionSharing -ConnectionName "vpn" -SharingMode "Disabled"
+#Set-NetConnectionSharing -ConnectionName "vpn" -SharingMode "Shared" -SharingConnectionType "direct"
+pause

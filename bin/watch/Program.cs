@@ -30,7 +30,7 @@ class Program
 
     static void Main(string[] args)
     {
-        Console.WriteLine(args[0]);
+        Console.WriteLine($"arg0a{args[0]}");
         Foreground();
         var folderWatcher = new FolderWatcher();
         folderWatcher.Start(".");
@@ -51,12 +51,15 @@ class Program
                 process = new System.Diagnostics.Process();
                 process.StartInfo.UseShellExecute = true;
                 var hit = Directory.GetFiles(args[0]).Any(x => x.EndsWith("run.bat"));
+                var ok = true;
                 if (hit)
                 {
                     process.StartInfo = new("cmd", $"/k run.bat");
+                    ok = true;
                 }
                 else
                 {
+                    ok = true;
                     switch (Path.GetExtension(path))
                     {
                         case ".py":
@@ -68,10 +71,24 @@ class Program
                         case ".csx":
                             process.StartInfo = new("dotnet", $"script {path}");
                             break;
+                        case ".ps1":
+                            process.StartInfo = new("PowerShell", $"-ExecutionPolicy RemoteSigned {path}");
+                            break;
+                        default:
+                            ok = false;
+                            break;
                     }
                 }
-                process.Start();
-                Thread.Sleep(1000);
+                if (ok)
+                {
+                    process.Start();
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    process = null;
+                    Console.WriteLine("No associated runner.");
+                }
                 // process.WaitForExit();
                 // Console.WriteLine("End");
             }
